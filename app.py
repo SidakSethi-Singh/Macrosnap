@@ -147,15 +147,18 @@ header_col, button_col = st.columns([5, 2], vertical_alignment = "center")
 with header_col:
     st.title("MacroSnap 🥗")
 with button_col:
-    send_disabled = len(st.session_state.messages) <= 1
-    if st.button("📤 Send to WhatsApp", disabled=send_disabled, use_container_width=True):
-         with st.spinner("Summarizing your day..."):
-             summary = ask_gemini([SUMMARY_REQUEST_PROMPT])
-         success, info = send_whatsapp(st.session_state.whatsapp_number, st.session_state.name, summary)
-         if success:
-             st.success("Sent! Check your WhatsApp 📲")
-         else:
-           st.error(f"Couldn't send that: {info}")
+    if st.button("📤 Send to WhatsApp", use_container_width=True):
+        has_user_meals = any(m.get("role") == "user" for m in st.session_state.messages)
+        if not has_user_meals:
+            st.warning("Please snap a photo or describe a meal first before requesting a summary!")
+        else:
+            with st.spinner("Summarizing your day..."):
+                summary = ask_gemini([SUMMARY_REQUEST_PROMPT])
+            success, info = send_whatsapp(st.session_state.whatsapp_number, st.session_state.name, summary)
+            if success:
+                st.success("Sent! Check your WhatsApp 📲")
+            else:
+                st.error(f"Couldn't send that: {info}")
  
 st.caption(f"Logged in as {st.session_state.name} - updates go to {st.session_state.whatsapp_number}")    
 
