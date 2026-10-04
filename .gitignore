@@ -1,0 +1,15 @@
+# Environment & Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Streamlit secrets (DO NOT COMMIT REAL API KEYS)
+.streamlit/secrets.toml
+!.streamlit/secrets.toml.example
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
