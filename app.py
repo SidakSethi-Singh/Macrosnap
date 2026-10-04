@@ -39,14 +39,26 @@ def clean_whatsapp_text(text):
  
 
  
+def format_whatsapp_number(number: str) -> str:
+    cleaned = "".join(c for c in str(number) if c.isdigit() or c == "+")
+    if not cleaned.startswith("+"):
+        cleaned = f"+{cleaned}"
+    return f"whatsapp:{cleaned}"
+
 def send_whatsapp(to_number, user_name, summary):
     try:
         content_variables = json.dumps(
-            {"1": user_name, "2": clean_whatsapp_text(summary)}, ensure_ascii=False
+            {"1": str(user_name), "2": clean_whatsapp_text(summary)}, ensure_ascii=False
         )
+        from_num = TWILIO_WHATSAPP_FROM
+        if not from_num.startswith("whatsapp:"):
+            from_num = f"whatsapp:{from_num}"
+
+        to_num = format_whatsapp_number(to_number)
+
         message = twilio_client.messages.create(
-            from_=TWILIO_WHATSAPP_FROM,
-            to=f"whatsapp:{to_number}",
+            from_=from_num,
+            to=to_num,
             content_sid=TWILIO_CONTENT_SID,
             content_variables=content_variables,
         )
